@@ -6,8 +6,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CalculadoraPedidoTest {
 
@@ -69,5 +71,30 @@ class CalculadoraPedidoTest {
         List<Producto> productos = List.of(producto("Lapiz", "11.11", 3));
 
         assertEquals(soles("39.33"), calc.calcularTotal(productos, soles("0")));
+    }
+
+    @Test
+    void precioNegativoLanzaExcepcion() {
+        List<Producto> productos = List.of(producto("Mouse", "-5.00", 1));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> calc.calcularSubtotal(productos));
+
+        assertEquals("El precio no puede ser negativo", ex.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, -2 })
+    void cantidadNoPositivaLanzaExcepcion(int cantidad) {
+        List<Producto> productos = List.of(producto("Mouse", "50.00", cantidad));
+
+        assertThrows(IllegalArgumentException.class, () -> calc.calcularSubtotal(productos));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { -1, 101 })
+    void descuentoFueraDeRangoLanzaExcepcion(int porcentaje) {
+        assertThrows(IllegalArgumentException.class,
+                () -> calc.aplicarDescuento(soles("100.00"), BigDecimal.valueOf(porcentaje)));
     }
 }
