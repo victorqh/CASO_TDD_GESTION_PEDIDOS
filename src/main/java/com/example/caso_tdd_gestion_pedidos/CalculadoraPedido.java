@@ -12,4 +12,9 @@ public class CalculadoraPedido {
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
     }
+
+    public BigDecimal aplicarDescuento(BigDecimal subtotal, BigDecimal porcentaje) {
+        BigDecimal descuento = subtotal.multiply(porcentaje).divide(new BigDecimal("100"));
+        return subtotal.subtract(descuento).setScale(2, RoundingMode.HALF_UP);
+    }
 }
