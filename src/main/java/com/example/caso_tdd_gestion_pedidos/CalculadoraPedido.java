@@ -13,10 +13,10 @@ public class CalculadoraPedido {
             validarProducto(producto);
         }
 
-        return productos.stream()
+        BigDecimal subtotal = productos.stream()
                 .map(producto -> producto.precio().multiply(BigDecimal.valueOf(producto.cantidad())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2, RoundingMode.HALF_UP);
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return redondear(subtotal);
     }
 
     public BigDecimal aplicarDescuento(BigDecimal subtotal, BigDecimal porcentaje) {
@@ -26,18 +26,22 @@ public class CalculadoraPedido {
         }
 
         BigDecimal descuento = subtotal.multiply(porcentaje).divide(new BigDecimal("100"));
-        return subtotal.subtract(descuento).setScale(2, RoundingMode.HALF_UP);
+        return redondear(subtotal.subtract(descuento));
     }
 
     public BigDecimal calcularImpuesto(BigDecimal baseImponible) {
-        return baseImponible.multiply(TASA_IGV).setScale(2, RoundingMode.HALF_UP);
+        return redondear(baseImponible.multiply(TASA_IGV));
     }
 
     public BigDecimal calcularTotal(List<Producto> productos, BigDecimal porcentaje) {
         BigDecimal subtotal = calcularSubtotal(productos);
         BigDecimal baseImponible = aplicarDescuento(subtotal, porcentaje);
         BigDecimal impuesto = calcularImpuesto(baseImponible);
-        return baseImponible.add(impuesto).setScale(2, RoundingMode.HALF_UP);
+        return redondear(baseImponible.add(impuesto));
+    }
+
+    private BigDecimal redondear(BigDecimal monto) {
+        return monto.setScale(2, RoundingMode.HALF_UP);
     }
 
     private void validarProducto(Producto producto) {
