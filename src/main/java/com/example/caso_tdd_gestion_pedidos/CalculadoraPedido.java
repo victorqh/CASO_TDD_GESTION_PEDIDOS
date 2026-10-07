@@ -9,6 +9,15 @@ public class CalculadoraPedido {
     private static final BigDecimal TASA_IGV = new BigDecimal("0.18");
 
     public BigDecimal calcularSubtotal(List<Producto> productos) {
+        for (Producto producto : productos) {
+            if (producto.precio().compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("El precio no puede ser negativo");
+            }
+            if (producto.cantidad() <= 0) {
+                throw new IllegalArgumentException("La cantidad debe ser mayor que cero");
+            }
+        }
+
         return productos.stream()
                 .map(producto -> producto.precio().multiply(BigDecimal.valueOf(producto.cantidad())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
@@ -16,6 +25,11 @@ public class CalculadoraPedido {
     }
 
     public BigDecimal aplicarDescuento(BigDecimal subtotal, BigDecimal porcentaje) {
+        if (porcentaje.compareTo(BigDecimal.ZERO) < 0
+                || porcentaje.compareTo(new BigDecimal("100")) > 0) {
+            throw new IllegalArgumentException("El descuento debe estar entre 0 y 100");
+        }
+
         BigDecimal descuento = subtotal.multiply(porcentaje).divide(new BigDecimal("100"));
         return subtotal.subtract(descuento).setScale(2, RoundingMode.HALF_UP);
     }
