@@ -10,12 +10,7 @@ public class CalculadoraPedido {
 
     public BigDecimal calcularSubtotal(List<Producto> productos) {
         for (Producto producto : productos) {
-            if (producto.precio().compareTo(BigDecimal.ZERO) < 0) {
-                throw new IllegalArgumentException("El precio no puede ser negativo");
-            }
-            if (producto.cantidad() <= 0) {
-                throw new IllegalArgumentException("La cantidad debe ser mayor que cero");
-            }
+            validarProducto(producto);
         }
 
         return productos.stream()
@@ -43,5 +38,14 @@ public class CalculadoraPedido {
         BigDecimal baseImponible = aplicarDescuento(subtotal, porcentaje);
         BigDecimal impuesto = calcularImpuesto(baseImponible);
         return baseImponible.add(impuesto).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private void validarProducto(Producto producto) {
+        if (producto.precio().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo");
+        }
+        if (producto.cantidad() <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor que cero");
+        }
     }
 }
