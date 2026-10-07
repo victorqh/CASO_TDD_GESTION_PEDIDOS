@@ -83,6 +83,13 @@ class CalculadoraPedidoTest {
         assertEquals("El precio no puede ser negativo", ex.getMessage());
     }
 
+    @Test
+    void totalSinCuponIncluyeIgv() {
+        List<Producto> productos = List.of(producto("Mouse", "100.00", 1));
+
+        assertEquals(soles("118.00"), calc.calcularTotal(productos));
+    }
+
     @ParameterizedTest
     @ValueSource(ints = { 0, -2 })
     void cantidadNoPositivaLanzaExcepcion(int cantidad) {
